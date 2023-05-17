@@ -1,10 +1,46 @@
+import datetime
 import discord
 from discord.ext import commands
 import time
 import aiosqlite
 from utils.utils import utc_now
+from config import TRACK_CHANNEL
 
 time_start = {}
+
+
+async def move_data_to_monthly(db):
+    async with db.execute("SELECT * FROM WeeklyStats") as weekly_cursor:
+        async for weekly_row in weekly_cursor:
+            user_id = weekly_row[0]
+            channel_id = weekly_row[1]
+            time_spent = weekly_row[2]
+            time_spent = round(time_spent, 2)
+
+            # Check if the row exists in MonthlyStats
+            matching_row = await db.execute("SELECT * FROM MonthlyStats WHERE UserID = ? AND ChannelID = ?",
+                                            (user_id, channel_id))
+            matching_row = await matching_row.fetchone()
+
+            if matching_row:
+                # If the row exists, update the TimeSpent
+                new_time_spent = matching_row[2] + time_spent
+                new_time_spent = round(new_time_spent, 2)
+                await db.execute("UPDATE MonthlyStats SET TimeSpent = ? WHERE UserID = ? AND ChannelID = ?",
+                                 (new_time_spent, user_id, channel_id))
+                await db.commit()
+            else:
+                # If the row doesn't exist, insert a new row with TimeSpent
+                await db.execute("INSERT INTO MonthlyStats (UserID, ChannelID, TimeSpent) VALUES (?, ?, ?)",
+                                 (user_id, channel_id, time_spent))
+                await db.commit()
+
+
+async def weekly_wipe(db):
+    if datetime.datetime.utcnow().weekday() == 0:
+        await move_data_to_monthly(db)
+        await db.execute("DELETE FROM WeeklyStats")
+        await db.commit()
 
 
 async def update_alltime_stats(db):
@@ -67,6 +103,7 @@ async def db_conversion(db):
                 if date[0] == 1 and date[1] != utc_now().month:
                     await update_alltime_stats(db)
                     await move_data(db)
+                    await weekly_wipe(db)
 
 
 class VoiceListener(commands.Cog):
@@ -78,8 +115,9 @@ class VoiceListener(commands.Cog):
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState,
                                     after: discord.VoiceState):
         if before.channel != after.channel and after.channel:
-            self.channels.append(after.channel.id)
-            time_start[member.id] = time.time()
+            if after.channel.id in TRACK_CHANNEL:
+                self.channels.append(after.channel.id)
+                time_start[member.id] = time.time()
         if before.channel and before.channel.id in self.channels:
             duration = time.time() - time_start.get(member.id, 0)
             duration = round(duration, 2)
@@ -121,6 +159,8 @@ class VoiceListener(commands.Cog):
                                 await db.execute("UPDATE AllTimeStats SET TimeSpent=? WHERE UserID=? AND ChannelID=?", data)
                                 await db.commit()
                                 await db_conversion(db)
+        else:
+            return
 
 
 def setup(bot):
