@@ -39,6 +39,7 @@ class ViewStats(commands.Cog):
                             else:
                                 em.add_field(name="Channel:", value=f" <#{detail[1]}> Time: {round(seconds, 2)} seconds",
                                              inline=False)
+                em.set_footer(text="These stats are updated on the first day of every month!")
             await ctx.respond(embed=em)
 
     @discord.slash_command(guild_ids=[GUILD_ID])

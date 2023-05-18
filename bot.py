@@ -23,7 +23,7 @@ class Bot(commands.Bot):
 intents = discord.Intents.all()
 bot = Bot(command_prefix=commands.when_mentioned_or(PREFIX), messages=True, case_insensitive=True, owner_ids=OWNERS,
           allowed_mentions=discord.AllowedMentions(roles=False, everyone=False), intents=intents,
-          debug_guilds=[722925148847472830], auto_sync_commands=True)
+          debug_guilds=[1108792016151781386], auto_sync_commands=True)
 
 # Load cogs
 for filename in os.listdir('./cogs'):
