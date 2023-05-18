@@ -1,5 +1,6 @@
 import discord
-from discord.ext import commands
+from discord.commands import SlashCommandGroup
+from discord.ext import commands, pages
 import datetime as dt
 from config import MAIN
 import time

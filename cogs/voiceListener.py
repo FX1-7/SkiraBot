@@ -125,8 +125,6 @@ class VoiceListener(commands.Cog):
                         if row:
                             # If there is a record in the db that matches the userID and current channel
                             time_spent = row[2] + duration
-                            day_number = int(utc_now().day)
-                            month_number = int(utc_now().month)
                             data = (time_spent, member.id, before.channel.id)
                             await db.execute("UPDATE WeeklyStats SET TimeSpent=? WHERE UserID=? AND ChannelID=?", data)
                             await db.commit()
@@ -153,8 +151,6 @@ class VoiceListener(commands.Cog):
                                         if row:
                                             # If there is a current record in the AllTime Table
                                             time_spent = row[2] + duration
-                                            day_number = int(utc_now().day)
-                                            month_number = int(utc_now().month)
                                             data = (time_spent, member.id, before.channel.id)
                                             await db.execute(
                                                 "UPDATE AllTimeStats SET TimeSpent=? WHERE UserID=? AND ChannelID=?",
