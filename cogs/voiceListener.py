@@ -114,51 +114,57 @@ class VoiceListener(commands.Cog):
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState,
                                     after: discord.VoiceState):
-        if before.channel != after.channel and after.channel:
-            if after.channel.id in TRACK_CHANNEL:
+        if before.channel != after.channel:
+            if before.channel and before.channel.id in TRACK_CHANNEL:
+                if before.channel is not None:
+                    duration = round(time.time() - time_start.get(member.id, 0), 2)
+                    async with aiosqlite.connect("data.db") as db:
+                        query = "SELECT * FROM WeeklyStats WHERE UserID=? AND ChannelID=?"
+                        rows = await db.execute(query, (member.id, before.channel.id))
+                        row = await rows.fetchone()
+                        if row:
+                            # If there is a record in the db that matches the userID and current channel
+                            time_spent = row[2] + duration
+                            day_number = int(utc_now().day)
+                            month_number = int(utc_now().month)
+                            data = (time_spent, member.id, before.channel.id)
+                            await db.execute("UPDATE WeeklyStats SET TimeSpent=? WHERE UserID=? AND ChannelID=?", data)
+                            await db.commit()
+                            await db_conversion(db)
+                        else:
+                            # Record doesn't exist, so create it
+                            day_number = int(utc_now().day)
+                            month_number = int(utc_now().month)
+                            await db.execute("INSERT INTO WeeklyStats (UserID, ChannelID, TimeSpent) VALUES (?,?,?)",
+                                             (member.id, before.channel.id, duration))
+                            await db.commit()
+                            async with db.execute("SELECT Date FROM LastUpdated") as last_date:
+                                last_date = await last_date.fetchone()
+                                if last_date is None:
+                                    await db.execute("INSERT INTO LastUpdated (Date, Month) VALUES (?, ?)",
+                                                     (day_number, month_number))
+                                    await db.commit()
+                                else:
+                                    if before.channel != after.channel:
+                                        data = (member.id, before.channel.id)
+                                        rows = await db.execute(
+                                            "SELECT * FROM AllTimeStats WHERE UserID=? AND ChannelID=?", data)
+                                        row = await rows.fetchone()
+                                        if row:
+                                            # If there is a current record in the AllTime Table
+                                            time_spent = row[2] + duration
+                                            day_number = int(utc_now().day)
+                                            month_number = int(utc_now().month)
+                                            data = (time_spent, member.id, before.channel.id)
+                                            await db.execute(
+                                                "UPDATE AllTimeStats SET TimeSpent=? WHERE UserID=? AND ChannelID=?",
+                                                data)
+                                            await db.commit()
+                                            await db_conversion(db)
+
+            if after.channel and after.channel.id in TRACK_CHANNEL:
                 self.channels.append(after.channel.id)
                 time_start[member.id] = time.time()
-        if before.channel and before.channel.id in self.channels:
-            duration = time.time() - time_start.get(member.id, 0)
-            duration = round(duration, 2)
-            async with aiosqlite.connect("data.db") as db:
-                query = "SELECT * FROM WeeklyStats WHERE UserID=? AND ChannelID=?"
-                rows = await db.execute(query, (member.id, before.channel.id))
-                row = await rows.fetchone()
-                if row:
-                    # If there is a record in the db that matches the userID and current channel
-                    time_spent = row[2] + duration
-                    day_number = int(utc_now().day)
-                    month_number = int(utc_now().month)
-                    data = (time_spent, member.id, before.channel.id)
-                    await db.execute("UPDATE WeeklyStats SET TimeSpent=? WHERE UserID=? AND ChannelID=?", data)
-                    await db.commit()
-                    await db_conversion(db)
-                else:
-                    # Record doesn't exist so create it
-                    day_number = int(utc_now().day)
-                    month_number = int(utc_now().month)
-                    await db.execute("INSERT INTO WeeklyStats (UserID, ChannelID, TimeSpent) VALUES (?,?,?)",
-                                     (member.id, before.channel.id, duration))
-                    await db.commit()
-                    async with db.execute("SELECT Date FROM LastUpdated") as last_date:
-                        last_date = await last_date.fetchone()
-                        if last_date is None:
-                            await db.execute("INSERT INTO LastUpdated (Date, Month) VALUES (?, ?)", (day_number, month_number))
-                            await db.commit()
-                        else:
-                            data = (member.id, before.channel.id)
-                            rows = await db.execute("SELECT * FROM AllTimeStats WHERE UserID=? AND ChannelID=?", data)
-                            row = await rows.fetchone()
-                            if row:
-                                # If there is a current record in the AllTime Table
-                                time_spent = row[2] + duration
-                                day_number = int(utc_now().day)
-                                month_number = int(utc_now().month)
-                                data = (time_spent, member.id, before.channel.id)
-                                await db.execute("UPDATE AllTimeStats SET TimeSpent=? WHERE UserID=? AND ChannelID=?", data)
-                                await db.commit()
-                                await db_conversion(db)
         else:
             return
 
