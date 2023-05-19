@@ -37,9 +37,11 @@ class CompanyStats(commands.Cog):
 
                     member = discord.utils.get(self.bot.get_all_members(), id=user_id)
                     if member is None:
+                        print("a")
                         continue
 
                     if discord.utils.get(member.roles, id=role_id) is None:
+                        print("b")
                         continue
 
                     if user_id not in user_stats:
