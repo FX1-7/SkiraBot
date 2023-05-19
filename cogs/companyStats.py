@@ -34,7 +34,6 @@ class CompanyStats(commands.Cog):
                     time_spent = detail[2]
 
                     member = discord.utils.get(self.bot.get_all_members(), id=user_id)
-                    print(f"user_id: {user_id}")
                     if member is None:
                         continue
 
@@ -42,8 +41,9 @@ class CompanyStats(commands.Cog):
                         continue
 
                     if user_id not in user_stats:
+                        print("Testing")
                         user_stats[user_id] = {}
-                        print(f"user_stats after adding entry: {user_stats}")
+                        print(user_stats[user_id])
 
                     if channel_id in user_stats[user_id]:
                         user_stats[user_id][channel_id] += time_spent
@@ -55,10 +55,7 @@ class CompanyStats(commands.Cog):
                                    timestamp=discord.utils.utcnow())
                 em.set_footer(text="These stats are updated on the first day of every month!")
 
-                print(f"user_stats: {user_stats}")
                 for user_id, stats in user_stats.items():
-                    print(f"user_id: {user_id}")
-                    print(f"stats: {stats}")
                     user_channels = []
 
                     for channel_id, time_spent in stats.items():
