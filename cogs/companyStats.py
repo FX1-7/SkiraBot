@@ -61,10 +61,53 @@ class CompanyStats(commands.Cog):
                         minutes, seconds = divmod(time_spent, 60)
                         hours, minutes = divmod(minutes, 60)
                         days, hours = divmod(hours, 24)
+                        days = round(days, 2)
+                        hours = round(hours, 2)
+                        minutes = round(minutes, 2)
+                        seconds = round(seconds, 2)
 
-                        user_channels.append(
-                            f"**Channel:** <#{channel_id}>, Time Spent: {int(days)} days, {int(hours)} hours,"
-                            f" {int(minutes)} minutes, {int(seconds)} seconds")
+                        print(seconds)
+
+                        if days > 1:
+                            if hours > 1:
+                                if minutes > 1:
+                                    if seconds > 1:
+                                        user_channels.append(f"**Channel:** <#{channel_id}>, "
+                                                             f"Time Spent: {int(days)} days, {int(hours)} hours,"
+                                                             f" {int(minutes)} minutes, {int(seconds)} seconds")
+                                    else:
+                                        user_channels.append(f"**Channel:** <#{channel_id}>, "
+                                                             f"Time Spent: {int(days)} days, {int(hours)} hours,"
+                                                             f" {int(minutes)} minutes")
+                                else:
+                                    user_channels.append(f"**Channel:** <#{channel_id}>, Time Spent: {int(days)} days"
+                                                         f", {int(hours)} hours,")
+                            else:
+                                user_channels.append(f"**Channel:** <#{channel_id}>, Time Spent: {int(days)} days")
+                        elif hours > 1:
+                            if minutes > 1:
+                                if seconds > 1:
+                                    user_channels.append(f"**Channel:** <#{channel_id}>, Time Spent: {int(hours)} hours,"
+                                                         f" {int(minutes)} minutes, {int(seconds)} seconds")
+                                else:
+                                    user_channels.append(
+                                        f"**Channel:** <#{channel_id}>, Time Spent: {int(hours)} hours,"
+                                        f" {int(minutes)} minutes")
+                            else:
+                                user_channels.append(
+                                    f"**Channel:** <#{channel_id}>, Time Spent: {int(hours)} hours")
+                        elif minutes > 1:
+                            if seconds > 1:
+                                user_channels.append(f"**Channel:** <#{channel_id}>,"
+                                                     f" Time Spent: {int(minutes)} minutes,"
+                                                     f" {int(seconds)} seconds")
+                            else:
+                                user_channels.append(f"**Channel:** <#{channel_id}>,"
+                                                     f" Time Spent: {int(minutes)} minutes.")
+                        elif seconds > 1:
+                            user_channels.append(
+                                f"**Channel:** <#{channel_id}>, Time Spent: {int(seconds)} seconds")
+
                     user_name = self.bot.get_user(user_id)
                     em.add_field(
                         name=f"User ID: {user_name.display_name}", value="\n".join(user_channels), inline=False)
