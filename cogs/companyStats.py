@@ -42,13 +42,14 @@ class CompanyStats(commands.Cog):
 
                     if user_id not in user_stats:
                         user_stats[user_id] = {}
+                        print(f"user_stats after adding entry: {user_stats}")
 
                     if channel_id in user_stats[user_id]:
                         user_stats[user_id][channel_id] += time_spent
                     else:
                         user_stats[user_id][channel_id] = time_spent
 
-                    print(f"user_stats after adding entry: {user_stats}")
+
                 em = discord.Embed(title="🔊 Skira Company All Time Stats Voice Stats 🔊", colour=discord.Colour.blue(),
                                    timestamp=discord.utils.utcnow())
                 em.set_footer(text="These stats are updated on the first day of every month!")
