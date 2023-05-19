@@ -66,8 +66,6 @@ class CompanyStats(commands.Cog):
                         minutes = round(minutes, 2)
                         seconds = round(seconds, 2)
 
-                        print(seconds)
-
                         if days > 1:
                             if hours > 1:
                                 if minutes > 1:
