@@ -48,10 +48,12 @@ class CompanyStats(commands.Cog):
                     else:
                         user_stats[user_id][channel_id] = time_spent
 
+                    print(f"user_stats after adding entry: {user_stats}")
                 em = discord.Embed(title="🔊 Skira Company All Time Stats Voice Stats 🔊", colour=discord.Colour.blue(),
                                    timestamp=discord.utils.utcnow())
                 em.set_footer(text="These stats are updated on the first day of every month!")
 
+                print(f"user_stats: {user_stats}")
                 for user_id, stats in user_stats.items():
                     print(f"user_id: {user_id}")
                     print(f"stats: {stats}")
