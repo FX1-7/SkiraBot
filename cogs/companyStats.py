@@ -35,7 +35,7 @@ class CompanyStats(commands.Cog):
                     print(user_stats)
                     print(user_id)
 
-                    member = self.bot.guild.get_member(user_id)
+                    member = self.bot.get_user(user_id)
                     if member is None:
                         print("a")
                         continue
