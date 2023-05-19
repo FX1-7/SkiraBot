@@ -34,6 +34,7 @@ class CompanyStats(commands.Cog):
                     time_spent = detail[2]
 
                     member = discord.utils.get(self.bot.get_all_members(), id=user_id)
+                    print(f"user_id: {user_id}")
                     if member is None:
                         continue
 
