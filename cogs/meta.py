@@ -12,11 +12,11 @@ class Meta(commands.Cog):
         await ctx.respond(f'{amount} Messages cleared by {ctx.author.mention}',
                           ephemeral=True)
 
-    @discord.slash_command(guild_ids=[GUILD_ID])
+    @commands.command()
     async def querydb(self, ctx, query: str):
         async with aiosqlite.connect("data.db") as db:
             async with db.execute(query) as Data:
-                await ctx.respond(content=Data)
+                await ctx.send(content=Data)
 
 def setup(bot):
     bot.add_cog(Meta(bot))
