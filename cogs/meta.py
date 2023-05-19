@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from jishaku.help_command import MinimalEmbedPaginatorHelp
 from config import GUILD_ID
+import aiosqlite
 
 
 class Meta(commands.Cog):
@@ -12,6 +12,11 @@ class Meta(commands.Cog):
         await ctx.respond(f'{amount} Messages cleared by {ctx.author.mention}',
                           ephemeral=True)
 
+    @discord.slash_command(guild_ids=[GUILD_ID])
+    async def querydb(self, ctx, query: str):
+        async with aiosqlite.connect("data.db") as db:
+            async with db.execute(query) as Data:
+                ctx.respond(text=Data)
 
 def setup(bot):
     bot.add_cog(Meta(bot))
