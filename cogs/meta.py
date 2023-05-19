@@ -13,11 +13,11 @@ class Meta(commands.Cog):
                           ephemeral=True)
 
     @commands.command()
-    async def querydb(self, ctx, query: str):
+    async def querydb(self, ctx, *, query: str):
         async with aiosqlite.connect("data.db") as db:
             async with db.execute(query) as Data:
                 for detail in Data:
-                await ctx.send(content=detail)
+                    await ctx.send(content=detail)
 
 def setup(bot):
     bot.add_cog(Meta(bot))
