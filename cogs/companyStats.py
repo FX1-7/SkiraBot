@@ -13,7 +13,17 @@ class CompanyStats(commands.Cog):
 
     async def fetchstats(self, role_id):
         async with aiosqlite.connect("data.db") as db:
-            query = "SELECT * FROM AllTimeStats"
+            query = """
+                        SELECT UserID, ChannelID, SUM(TimeSpent) AS TotalTimeSpent
+                        FROM (
+                            SELECT UserID, ChannelID, TimeSpent FROM AllTimeStats
+                            UNION ALL
+                            SELECT UserID, ChannelID, TimeSpent FROM WeeklyStats
+                            UNION ALL
+                            SELECT UserID, ChannelID, TimeSpent FROM MonthlyStats
+                        ) AS CombinedStats
+                        GROUP BY UserID, ChannelID
+                    """
             async with db.execute(query) as UserStats:
                 entry = await UserStats.fetchall()
                 user_stats = {}
@@ -30,11 +40,13 @@ class CompanyStats(commands.Cog):
                     if discord.utils.get(member.roles, id=role_id) is None:
                         continue
 
-
                     if user_id not in user_stats:
-                        user_stats[user_id] = []
+                        user_stats[user_id] = {}
 
-                    user_stats[user_id].append((channel_id, time_spent))
+                    if channel_id in user_stats[user_id]:
+                        user_stats[user_id][channel_id] += time_spent
+                    else:
+                        user_stats[user_id][channel_id] = time_spent
 
                 em = discord.Embed(title="🔊 Skira Company All Time Stats Voice Stats 🔊", colour=discord.Colour.blue(),
                                    timestamp=discord.utils.utcnow())
@@ -43,7 +55,7 @@ class CompanyStats(commands.Cog):
                 for user_id, stats in user_stats.items():
                     user_channels = []
 
-                    for channel_id, time_spent in stats:
+                    for channel_id, time_spent in stats.items():
                         minutes, seconds = divmod(time_spent, 60)
                         hours, minutes = divmod(minutes, 60)
                         days, hours = divmod(hours, 24)
