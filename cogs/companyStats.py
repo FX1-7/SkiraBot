@@ -87,6 +87,7 @@ class CompanyStats(commands.Cog):
     async def alltime(self, ctx: discord.ApplicationContext, role: discord.Role):
         self.pages = []
 
+        print(role.id)
         await self.fetchstats(role.id)
 
         for page in self.pages:
