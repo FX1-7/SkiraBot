@@ -60,7 +60,7 @@ class CompanyStats(commands.Cog):
                         hours, minutes = divmod(minutes, 60)
                         days, hours = divmod(hours, 24)
 
-                        print(user_id, channel_id, time_spent)
+                        print(channel_id)
 
                         user_channels.append(
                             f"**Channel:** <#{channel_id}>, Time Spent: {int(days)} days, {int(hours)} hours,"
