@@ -32,23 +32,17 @@ class CompanyStats(commands.Cog):
                     user_id = detail[0]
                     channel_id = detail[1]
                     time_spent = detail[2]
-                    print(user_stats)
-                    print(user_id)
 
                     guild = self.bot.get_guild(guild_id)
                     member = guild.get_member(user_id)
                     if member is None:
-                        print("a")
                         continue
 
                     if discord.utils.get(member.roles, id=role_id) is None:
-                        print("b")
                         continue
 
                     if user_id not in user_stats:
-                        print("Testing")
                         user_stats[user_id] = {}
-                        print(user_stats[user_id])
 
                     if channel_id in user_stats[user_id]:
                         user_stats[user_id][channel_id] += time_spent
@@ -68,8 +62,6 @@ class CompanyStats(commands.Cog):
                         hours, minutes = divmod(minutes, 60)
                         days, hours = divmod(hours, 24)
 
-                        print(channel_id)
-
                         user_channels.append(
                             f"**Channel:** <#{channel_id}>, Time Spent: {int(days)} days, {int(hours)} hours,"
                             f" {int(minutes)} minutes, {int(seconds)} seconds")
@@ -88,7 +80,6 @@ class CompanyStats(commands.Cog):
     async def alltime(self, ctx: discord.ApplicationContext, role: discord.Role):
         self.pages = []
 
-        print(role.id)
         await self.fetchstats(role.id, ctx.guild_id)
 
         for page in self.pages:
