@@ -11,7 +11,7 @@ class CompanyStats(commands.Cog):
         self.bot = bot
         self.pages = []
 
-    async def fetchstats(self, role_id):
+    async def fetchstats(self, role_id, guild_id):
         async with aiosqlite.connect("data.db") as db:
             query = """
                         SELECT UserID, ChannelID, SUM(TimeSpent) AS TotalTimeSpent
@@ -35,7 +35,8 @@ class CompanyStats(commands.Cog):
                     print(user_stats)
                     print(user_id)
 
-                    member = self.bot.get_member(user_id)
+                    guild = self.bot.get_guild(guild_id)
+                    member = guild.get_member(user_id)
                     if member is None:
                         print("a")
                         continue
@@ -88,7 +89,7 @@ class CompanyStats(commands.Cog):
         self.pages = []
 
         print(role.id)
-        await self.fetchstats(role.id)
+        await self.fetchstats(role.id, ctx.guild_id)
 
         for page in self.pages:
             await ctx.respond(embed=page)
