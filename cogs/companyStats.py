@@ -53,6 +53,8 @@ class CompanyStats(commands.Cog):
                 em.set_footer(text="These stats are updated on the first day of every month!")
 
                 for user_id, stats in user_stats.items():
+                    print(f"user_id: {user_id}")
+                    print(f"stats: {stats}")
                     user_channels = []
 
                     for channel_id, time_spent in stats.items():
