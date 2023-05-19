@@ -35,7 +35,7 @@ class CompanyStats(commands.Cog):
                     print(user_stats)
                     print(user_id)
 
-                    member = discord.utils.get(self.bot.get_all_members(), id=user_id)
+                    member = self.bot.get_member(user_id)
                     if member is None:
                         print("a")
                         continue
