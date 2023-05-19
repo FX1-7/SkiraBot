@@ -32,7 +32,6 @@ class CompanyStats(commands.Cog):
                     user_id = detail[0]
                     channel_id = detail[1]
                     time_spent = detail[2]
-                    print(user_id, channel_id, time_spent)
 
                     member = discord.utils.get(self.bot.get_all_members(), id=user_id)
                     if member is None:
@@ -60,6 +59,8 @@ class CompanyStats(commands.Cog):
                         minutes, seconds = divmod(time_spent, 60)
                         hours, minutes = divmod(minutes, 60)
                         days, hours = divmod(hours, 24)
+
+                        print(user_id, channel_id, time_spent)
 
                         user_channels.append(
                             f"**Channel:** <#{channel_id}>, Time Spent: {int(days)} days, {int(hours)} hours,"
