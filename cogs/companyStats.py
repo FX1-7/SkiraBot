@@ -53,62 +53,29 @@ class CompanyStats(commands.Cog):
                                    timestamp=discord.utils.utcnow())
 
                 for user_id, stats in user_stats.items():
-                    user_channels = []
-
-                    for channel_id, time_spent in stats.items():
-                        minutes, seconds = divmod(time_spent, 60)
-                        hours, minutes = divmod(minutes, 60)
-                        days, hours = divmod(hours, 24)
-                        days = round(days, 2)
-                        hours = round(hours, 2)
-                        minutes = round(minutes, 2)
-                        seconds = round(seconds, 2)
-
-                        if days > 1:
-                            if hours > 1:
-                                if minutes > 1:
-                                    if seconds > 1:
-                                        user_channels.append(f"**Channel:** <#{channel_id}>, "
-                                                             f"Time Spent: {int(days)} days, {int(hours)} hours,"
-                                                             f" {int(minutes)} minutes, {int(seconds)} seconds")
-                                    else:
-                                        user_channels.append(f"**Channel:** <#{channel_id}>, "
-                                                             f"Time Spent: {int(days)} days, {int(hours)} hours,"
-                                                             f" {int(minutes)} minutes")
-                                else:
-                                    user_channels.append(f"**Channel:** <#{channel_id}>, Time Spent: {int(days)} days"
-                                                         f", {int(hours)} hours,")
-                            else:
-                                user_channels.append(f"**Channel:** <#{channel_id}>, Time Spent: {int(days)} days")
-                        elif hours > 1:
-                            if minutes > 1:
-                                if seconds > 1:
-                                    user_channels.append(f"**Channel:** <#{channel_id}>, Time Spent: {int(hours)} hours,"
-                                                         f" {int(minutes)} minutes, {int(seconds)} seconds")
-                                else:
-                                    user_channels.append(
-                                        f"**Channel:** <#{channel_id}>, Time Spent: {int(hours)} hours,"
-                                        f" {int(minutes)} minutes")
-                            else:
-                                user_channels.append(
-                                    f"**Channel:** <#{channel_id}>, Time Spent: {int(hours)} hours")
-                        elif minutes > 1:
-                            if seconds > 1:
-                                user_channels.append(f"**Channel:** <#{channel_id}>,"
-                                                     f" Time Spent: {int(minutes)} minutes,"
-                                                     f" {int(seconds)} seconds")
-                            else:
-                                user_channels.append(f"**Channel:** <#{channel_id}>,"
-                                                     f" Time Spent: {int(minutes)} minutes.")
-                        elif seconds > 1:
-                            user_channels.append(
-                                f"**Channel:** <#{channel_id}>, Time Spent: {int(seconds)} seconds")
+                    total_time_spent = sum(stats.values())
+                    minutes, seconds = divmod(total_time_spent, 60)
+                    hours, minutes = divmod(minutes, 60)
+                    days, hours = divmod(hours, 24)
+                    days = round(days, 2)
+                    hours = round(hours, 2)
+                    minutes = round(minutes, 2)
+                    seconds = round(seconds, 2)
 
                     user_name = self.bot.get_user(user_id)
-                    em.add_field(
-                        name=f"User ID: {user_name.display_name}", value="\n".join(user_channels), inline=False)
+                    time_string = ""
+                    if days > 0:
+                        time_string += f"{int(days)} days, "
+                    if hours > 0:
+                        time_string += f"{int(hours)} hours, "
+                    if minutes > 0:
+                        time_string += f"{int(minutes)} minutes, "
+                    if seconds > 0:
+                        time_string += f"{int(seconds)} seconds"
+                    em.add_field(name=f"User ID: {user_name.display_name}",
+                                 value=f"**Total Play Time:** {time_string}", inline=False)
 
-                self.pages.append(em)
+            self.pages.append(em)
 
     def get_pages(self):
         return self.pages
