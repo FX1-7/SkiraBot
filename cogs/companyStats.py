@@ -49,7 +49,7 @@ class CompanyStats(commands.Cog):
                     else:
                         user_stats[user_id][channel_id] = time_spent
 
-                em = discord.Embed(title="🔊 All Time Voice Stats 🔊", colour=discord.Colour.blue(),
+                em = discord.Embed(title="🔊 All Time Voice Stats 🔊", colour=MAIN,
                                    timestamp=discord.utils.utcnow())
 
                 for user_id, stats in user_stats.items():
@@ -102,7 +102,7 @@ class CompanyStats(commands.Cog):
 
                     user_stats[user_id] = time_spent
 
-                em = discord.Embed(title="🔊 Weekly Voice Stats 🔊", colour=discord.Colour.blue(),
+                em = discord.Embed(title="🔊 Weekly Voice Stats 🔊", colour=MAIN,
                                    timestamp=discord.utils.utcnow())
 
                 for user_id, time_spent in user_stats.items():
@@ -160,7 +160,7 @@ class CompanyStats(commands.Cog):
 
                     user_stats[user_id] = time_spent
 
-                em = discord.Embed(title="🔊 Monthly Voice Stats 🔊", colour=discord.Colour.blue(),
+                em = discord.Embed(title="🔊 Monthly Voice Stats 🔊", colour=MAIN,
                                    timestamp=discord.utils.utcnow())
 
                 for user_id, time_spent in user_stats.items():
