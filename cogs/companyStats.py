@@ -9,7 +9,9 @@ import aiosqlite
 class CompanyStats(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.pages = []
+        self.alltime_pages = []
+        self.weekly_pages = []
+        self.monthly_pages = []
 
     async def allstats(self, role_id, guild_id):
         async with aiosqlite.connect("data.db") as db:
@@ -75,7 +77,7 @@ class CompanyStats(commands.Cog):
                     em.add_field(name=f"User ID: {user_name.display_name}",
                                  value=f"**Total Play Time:** {time_string}", inline=False)
 
-            self.pages.append(em)
+            self.alltime_pages.append(em)
 
     async def weeklystats(self, role_id, guild_id):
         async with aiosqlite.connect("data.db") as db:
@@ -129,7 +131,8 @@ class CompanyStats(commands.Cog):
                         name=f"User ID: {user_name.display_name}", value=f"Total Time Spent: {time_string}",
                         inline=False)
 
-                self.pages.append(em)
+
+                self.weekly_pages.append(em)
 
     async def monthlystats(self, role_id, guild_id):
         async with aiosqlite.connect("data.db") as db:
@@ -187,8 +190,16 @@ class CompanyStats(commands.Cog):
                         name=f"User ID: {user_name.display_name}", value=f"Total Time Spent: {time_string}",
                         inline=False)
 
-                self.pages.append(em)
+                self.monthly_pages.append(em)
 
+    def get_alltime_pages(self):
+        return self.alltime_pages
+
+    def get_weekly_pages(self):
+        return self.weekly_pages
+
+    def get_monthly_pages(self):
+        return self.monthly_pages
 
     def get_pages(self):
         return self.pages
@@ -198,30 +209,30 @@ class CompanyStats(commands.Cog):
 
     @skirastats.command(name="alltime", description="Shows all time stats for all users in x role")
     async def alltime(self, ctx: discord.ApplicationContext, role: discord.Role):
-        self.pages = []
+        self.alltime_pages = []
 
         await self.allstats(role.id, ctx.guild_id)
 
-        for page in self.pages:
-            await ctx.respond(embed=page)
+        paginator = pages.Paginator(pages=self.get_alltime_pages())
+        await paginator.respond(ctx.interaction)
 
     @skirastats.command(name="weekly", description="Shows Weekly time stats for all users in x role")
     async def weekly(self, ctx: discord.ApplicationContext, role: discord.Role):
-        self.pages = []
+        self.weekly_pages = []
 
         await self.weeklystats(role.id, ctx.guild_id)
 
-        for page in self.pages:
-            await ctx.respond(embed=page)
+        paginator = pages.Paginator(pages=self.get_weekly_pages())
+        await paginator.respond(ctx.interaction)
 
     @skirastats.command(name="monthly", description="Shows Weekly time stats for all users in x role")
     async def monthly(self, ctx: discord.ApplicationContext, role: discord.Role):
-        self.pages = []
+        self.monthly_pages = []
 
         await self.monthlystats(role.id, ctx.guild_id)
 
-        for page in self.pages:
-            await ctx.respond(embed=page)
+        paginator = pages.Paginator(pages=self.get_monthly_pages())
+        await paginator.respond(ctx.interaction)
 
 
 def setup(bot):
