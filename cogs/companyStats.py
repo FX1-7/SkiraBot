@@ -11,7 +11,7 @@ class CompanyStats(commands.Cog):
         self.bot = bot
         self.pages = []
 
-    async def fetchstats(self, role_id, guild_id):
+    async def allstats(self, role_id, guild_id):
         async with aiosqlite.connect("data.db") as db:
             query = """
                         SELECT UserID, ChannelID, SUM(TimeSpent) AS TotalTimeSpent
@@ -86,7 +86,7 @@ class CompanyStats(commands.Cog):
     async def alltime(self, ctx: discord.ApplicationContext, role: discord.Role):
         self.pages = []
 
-        await self.fetchstats(role.id, ctx.guild_id)
+        await self.allstats(role.id, ctx.guild_id)
 
         for page in self.pages:
             await ctx.respond(embed=page)
