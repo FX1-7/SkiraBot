@@ -145,7 +145,7 @@ class CompanyStats(commands.Cog):
                                     monthly_stats[user_id] = time_spent
 
                     month_name = datetime.date(1900, target_month, 1).strftime("%B")
-                    month_stats = ""
+                    month_stats = []
 
                     for user_id, time_spent in monthly_stats.items():
                         guild = self.bot.get_guild(guild_id)
@@ -160,20 +160,21 @@ class CompanyStats(commands.Cog):
                         days = round(hours / 24, 2)
 
                         if days >= 1:
-                            month_stats += f"**User: {member.display_name}**, Time: {int(days)} days, {int(hours)} hours.\n"
+                            month_stats.append(
+                                f"**User: {member.display_name}**, Time: {int(days)} days, {int(hours)} hours.")
                         elif hours >= 1:
-                            month_stats += f"**User: {member.display_name}**, Time: {int(hours)} hours.\n"
-                        else:
-                            continue
+                            month_stats.append(f"**User: {member.display_name}**, Time: {int(hours)} hours.")
 
                     if month_stats:
-                        em.add_field(name=f"{month_name}", value=month_stats, inline=False)
+                        month_stats_string = "\n".join(month_stats)
+                        em.add_field(name=f"{month_name}", value=month_stats_string, inline=False)
                         em.set_footer(text=f"Month: {month_name}")
                     else:
                         em.add_field(name=f"{month_name}", value="No data available", inline=False)
                         em.set_footer(text=f"Month: {month_name}")
 
             self.monthly_pages.append(em)
+
     def get_alltime_pages(self):
         return self.alltime_pages
 
