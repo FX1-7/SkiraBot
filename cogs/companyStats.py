@@ -131,66 +131,71 @@ class CompanyStats(commands.Cog):
                         name=f"User ID: {user_name.display_name}", value=f"Total Time Spent: {time_string}",
                         inline=False)
 
-
                 self.weekly_pages.append(em)
 
     async def monthlystats(self, role_id, guild_id):
         async with aiosqlite.connect("data.db") as db:
-            query = """
-                SELECT UserID, SUM(TimeSpent) AS TotalTimeSpent
-                FROM (
-                    SELECT UserID, TimeSpent FROM WeeklyStats
-                    UNION ALL
-                    SELECT UserID, TimeSpent FROM MonthlyStats
-                ) AS CombinedStats
-                GROUP BY UserID
-            """
-            async with db.execute(query) as UserStats:
-                entry = await UserStats.fetchall()
-                user_stats = {}
+            current_month = datetime.datetime.utcnow().month
+            target_months = [(current_month - i) % 12 for i in range(3)]
 
-                for detail in entry:
-                    user_id = detail[0]
-                    time_spent = detail[1]
+            em = discord.Embed(title="🔊 Monthly Voice Stats 🔊", colour=MAIN, timestamp=discord.utils.utcnow())
 
-                    guild = self.bot.get_guild(guild_id)
-                    member = guild.get_member(user_id)
-                    if member is None:
-                        continue
+            for target_month in target_months:
+                async with db.execute(
+                        "SELECT UserID, SUM(TimeSpent) AS TotalTimeSpent FROM MonthlyStats WHERE Month = ? GROUP BY UserID",
+                        (target_month,)) as MonthlyStats:
+                    monthly_entry = await MonthlyStats.fetchall()
+                    monthly_stats = {}
 
-                    if discord.utils.get(member.roles, id=role_id) is None:
-                        continue
+                    for detail in monthly_entry:
+                        user_id = detail[0]
+                        time_spent = detail[1]
+                        monthly_stats[user_id] = time_spent
 
-                    user_stats[user_id] = time_spent
+                    if target_month == current_month:
+                        async with db.execute("SELECT UserID, TimeSpent FROM WeeklyStats") as WeeklyStats:
+                            weekly_entry = await WeeklyStats.fetchall()
 
-                em = discord.Embed(title="🔊 Monthly Voice Stats 🔊", colour=MAIN,
-                                   timestamp=discord.utils.utcnow())
+                            for detail in weekly_entry:
+                                user_id = detail[0]
+                                time_spent = detail[1]
 
-                for user_id, time_spent in user_stats.items():
-                    minutes, seconds = divmod(time_spent, 60)
-                    hours, minutes = divmod(minutes, 60)
-                    days, hours = divmod(hours, 24)
-                    days = round(days, 2)
-                    hours = round(hours, 2)
-                    minutes = round(minutes, 2)
-                    seconds = round(seconds, 2)
+                                if user_id in monthly_stats:
+                                    monthly_stats[user_id] += time_spent
+                                else:
+                                    monthly_stats[user_id] = time_spent
 
-                    user_name = self.bot.get_user(user_id)
-                    time_string = ""
-                    if days > 0:
-                        time_string += f"{int(days)} days, "
-                    if hours > 0:
-                        time_string += f"{int(hours)} hours, "
-                    if minutes > 0:
-                        time_string += f"{int(minutes)} minutes, "
-                    if seconds > 0:
-                        time_string += f"{int(seconds)} seconds"
+                    month_name = datetime.date(1900, target_month, 1).strftime("%B")
+                    month_stats = ""
 
-                    em.add_field(
-                        name=f"User ID: {user_name.display_name}", value=f"Total Time Spent: {time_string}",
-                        inline=False)
+                    for user_id, time_spent in monthly_stats.items():
+                        guild = self.bot.get_guild(guild_id)
+                        member = guild.get_member(user_id)
+                        if member is None:
+                            continue
 
-                self.monthly_pages.append(em)
+                        if discord.utils.get(member.roles, id=role_id) is None:
+                            continue
+
+                        minutes, seconds = divmod(time_spent, 60)
+                        hours, minutes = divmod(minutes, 60)
+                        days, hours = divmod(hours, 24)
+
+                        if days >= 1:
+                            month_stats += f"**User: {member.display_name}**, Time: {int(days)} days, {int(hours)} hours, {int(minutes)} minutes, {round(seconds, 2)} seconds\n"
+                        elif hours >= 1:
+                            month_stats += f"**User: {member.display_name}**, Time: {int(hours)} hours, {int(minutes)} minutes, {round(seconds, 2)} seconds\n"
+                        elif minutes >= 1:
+                            month_stats += f"**User: {member.display_name}**, Time: {int(minutes)} minutes, {round(seconds, 2)} seconds\n"
+                        else:
+                            month_stats += f"**User: {member.display_name}**, Time: {round(seconds, 2)} seconds\n"
+
+                    if month_stats:
+                        em.add_field(name=f"{month_name}", value=month_stats, inline=False)
+                    else:
+                        em.add_field(name=f"{month_name}", value="No data available", inline=False)
+
+            self.monthly_pages.append(em)
 
     def get_alltime_pages(self):
         return self.alltime_pages
