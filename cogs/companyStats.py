@@ -168,8 +168,10 @@ class CompanyStats(commands.Cog):
 
                     if month_stats:
                         em.add_field(name=f"{month_name}", value=month_stats, inline=False)
+                        em.set_footer(text=f"Month: {month_name}")
                     else:
                         em.add_field(name=f"{month_name}", value="No data available", inline=False)
+                        em.set_footer(text=f"Month: {month_name}")
 
             self.monthly_pages.append(em)
     def get_alltime_pages(self):
