@@ -51,31 +51,21 @@ class CompanyStats(commands.Cog):
                     else:
                         user_stats[user_id][channel_id] = time_spent
 
-                em = discord.Embed(title="🔊 All Time Voice Stats 🔊", colour=MAIN,
-                                   timestamp=discord.utils.utcnow())
+                em = discord.Embed(title="🔊 All Time Voice Stats 🔊", colour=MAIN, timestamp=discord.utils.utcnow())
 
                 for user_id, stats in user_stats.items():
                     total_time_spent = sum(stats.values())
-                    minutes, seconds = divmod(total_time_spent, 60)
-                    hours, minutes = divmod(minutes, 60)
-                    days, hours = divmod(hours, 24)
-                    days = round(days, 2)
-                    hours = round(hours, 2)
-                    minutes = round(minutes, 2)
-                    seconds = round(seconds, 2)
+                    hours = round(total_time_spent / 3600, 2)
+                    days = round(hours / 24, 2)
 
                     user_name = self.bot.get_user(user_id)
                     time_string = ""
                     if days > 0:
                         time_string += f"{int(days)} days, "
                     if hours > 0:
-                        time_string += f"{int(hours)} hours, "
-                    if minutes > 0:
-                        time_string += f"{int(minutes)} minutes, "
-                    if seconds > 0:
-                        time_string += f"{int(seconds)} seconds"
-                    em.add_field(name=f"User ID: {user_name.display_name}",
-                                 value=f"**Total Play Time:** {time_string}", inline=False)
+                        time_string += f"{int(hours)} hours."
+                    em.add_field(name=f"User ID: {user_name.display_name}", value=f"**Total Play Time:** {time_string}",
+                                 inline=False)
 
             self.alltime_pages.append(em)
 
@@ -104,32 +94,21 @@ class CompanyStats(commands.Cog):
 
                     user_stats[user_id] = time_spent
 
-                em = discord.Embed(title="🔊 Weekly Voice Stats 🔊", colour=MAIN,
-                                   timestamp=discord.utils.utcnow())
+                em = discord.Embed(title="🔊 Weekly Voice Stats 🔊", colour=MAIN, timestamp=discord.utils.utcnow())
 
                 for user_id, time_spent in user_stats.items():
-                    minutes, seconds = divmod(time_spent, 60)
-                    hours, minutes = divmod(minutes, 60)
-                    days, hours = divmod(hours, 24)
-                    days = round(days, 2)
-                    hours = round(hours, 2)
-                    minutes = round(minutes, 2)
-                    seconds = round(seconds, 2)
+                    hours = round(time_spent / 3600, 2)
+                    days = round(hours / 24, 2)
 
                     user_name = self.bot.get_user(user_id)
                     time_string = ""
                     if days > 0:
                         time_string += f"{int(days)} days, "
                     if hours > 0:
-                        time_string += f"{int(hours)} hours, "
-                    if minutes > 0:
-                        time_string += f"{int(minutes)} minutes, "
-                    if seconds > 0:
-                        time_string += f"{int(seconds)} seconds"
+                        time_string += f"{int(hours)} hours"
 
-                    em.add_field(
-                        name=f"User ID: {user_name.display_name}", value=f"Total Time Spent: {time_string}",
-                        inline=False)
+                    em.add_field(name=f"User ID: {user_name.display_name}", value=f"Total Time Spent: {time_string}",
+                                 inline=False)
 
                 self.weekly_pages.append(em)
 
@@ -177,18 +156,15 @@ class CompanyStats(commands.Cog):
                         if discord.utils.get(member.roles, id=role_id) is None:
                             continue
 
-                        minutes, seconds = divmod(time_spent, 60)
-                        hours, minutes = divmod(minutes, 60)
-                        days, hours = divmod(hours, 24)
+                        hours = round(time_spent / 3600, 2)
+                        days = round(hours / 24, 2)
 
                         if days >= 1:
-                            month_stats += f"**User: {member.display_name}**, Time: {int(days)} days, {int(hours)} hours, {int(minutes)} minutes, {round(seconds, 2)} seconds\n"
+                            month_stats += f"**User: {member.display_name}**, Time: {int(days)} days, {int(hours)} hours.\n"
                         elif hours >= 1:
-                            month_stats += f"**User: {member.display_name}**, Time: {int(hours)} hours, {int(minutes)} minutes, {round(seconds, 2)} seconds\n"
-                        elif minutes >= 1:
-                            month_stats += f"**User: {member.display_name}**, Time: {int(minutes)} minutes, {round(seconds, 2)} seconds\n"
+                            month_stats += f"**User: {member.display_name}**, Time: {int(hours)} hours.\n"
                         else:
-                            month_stats += f"**User: {member.display_name}**, Time: {round(seconds, 2)} seconds\n"
+                            continue
 
                     if month_stats:
                         em.add_field(name=f"{month_name}", value=month_stats, inline=False)
@@ -196,7 +172,6 @@ class CompanyStats(commands.Cog):
                         em.add_field(name=f"{month_name}", value="No data available", inline=False)
 
             self.monthly_pages.append(em)
-
     def get_alltime_pages(self):
         return self.alltime_pages
 
