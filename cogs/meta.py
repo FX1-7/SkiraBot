@@ -14,7 +14,7 @@ class Meta(commands.Cog):
                           ephemeral=True)
 
     @commands.command()
-    async def querydb(self, ctx, *, query: str):
+    async def query(self, ctx, *, query: str):
         async with aiosqlite.connect("data.db") as db:
             async with db.execute(query) as Data:
                 entry = await Data.fetchall()
