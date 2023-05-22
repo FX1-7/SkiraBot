@@ -1,7 +1,7 @@
 import discord
 from discord.commands import SlashCommandGroup
 from discord.ext import commands, pages
-import datetime as dt
+import datetime
 from config import MAIN
 import time
 import aiosqlite
@@ -79,33 +79,42 @@ class ViewStats(commands.Cog):
     async def monthlystats(self, ctx: discord.ApplicationContext, member: discord.Member):
         UserID = member.id
         async with aiosqlite.connect("data.db") as db:
-            async with db.execute("SELECT * FROM MonthlyStats WHERE UserID = ?", (UserID,)) as UserStats:
-                entry = await UserStats.fetchall()
-                em = discord.Embed(title=f"🔊 {member.display_name}'s Monthly Voice Stats 🔊", colour=MAIN,
-                                   timestamp=discord.utils.utcnow())
-                for detail in entry:
-                    minutes, seconds = divmod(detail[2], 60)
-                    hours, minutes = divmod(minutes, 60)
-                    days, hours = divmod(hours, 24)
-                    if days >= 1:
-                        em.add_field(name="Channel:",
-                                     value=f" <#{detail[1]}> Time: {int(days)} days, {int(hours)} hours,"
-                                           f" {int(minutes)} minutes, {round(seconds, 2)} seconds", inline=False)
-                    else:
-                        if hours >= 1:
-                            em.add_field(name="Channel:", value=f" <#{detail[1]}> Time: {int(hours)} hours,"
-                                                                f" {int(minutes)} minutes, {round(seconds, 2)} seconds",
-                                         inline=False)
+            current_month = datetime.datetime.utcnow().month
+            target_months = [(current_month - i) % 12 for i in range(3)]
+
+            em = discord.Embed(title=f"🔊 {member.display_name}'s Monthly Voice Stats 🔊", colour=MAIN,
+                               timestamp=discord.utils.utcnow())
+
+            for target_month in target_months:
+                async with db.execute("SELECT * FROM MonthlyStats WHERE UserID = ? AND Month = ?",
+                                      (UserID, target_month)) as UserStats:
+                    entry = await UserStats.fetchall()
+                    month_name = datetime.date(1900, target_month, 1).strftime("%B")
+                    month_stats = ""
+
+                    for detail in entry:
+                        minutes, seconds = divmod(detail[2], 60)
+                        hours, minutes = divmod(minutes, 60)
+                        days, hours = divmod(hours, 24)
+
+                        if days >= 1:
+                            month_stats += f"Channel: <#{detail[1]}> Time: {int(days)} days, {int(hours)} hours," \
+                                           f" {int(minutes)} minutes, {round(seconds, 2)} seconds\n"
+                        elif hours >= 1:
+                            month_stats += f"Channel: <#{detail[1]}> Time: {int(hours)} hours, {int(minutes)} minutes," \
+                                           f" {round(seconds, 2)} seconds\n"
+                        elif minutes >= 1:
+                            month_stats += f"Channel: <#{detail[1]}> Time: {int(minutes)} minutes," \
+                                           f" {round(seconds, 2)} seconds\n"
                         else:
-                            if minutes >= 1:
-                                em.add_field(name="Channel:", value=f" <#{detail[1]}> Time: {int(minutes)} minutes,"
-                                                                    f" {round(seconds, 2)} seconds",
-                                             inline=False)
-                            else:
-                                em.add_field(name="Channel:",
-                                             value=f" <#{detail[1]}> Time: {round(seconds, 2)} seconds",
-                                             inline=False)
-            await ctx.respond(embed=em)
+                            month_stats += f"Channel: <#{detail[1]}> Time: {round(seconds, 2)} seconds\n"
+
+                    if month_stats:
+                        em.add_field(name=f"{month_name}", value=month_stats, inline=False)
+                    else:
+                        em.add_field(name=f"{month_name}", value="No data available", inline=False)
+
+        await ctx.respond(embed=em)
 
 
 def setup(bot):

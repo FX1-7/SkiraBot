@@ -10,6 +10,8 @@ time_start = {}
 
 
 async def move_data_to_monthly(db):
+    current_month = datetime.datetime.utcnow().month
+
     async with db.execute("SELECT * FROM WeeklyStats") as weekly_cursor:
         async for weekly_row in weekly_cursor:
             user_id = weekly_row[0]
@@ -18,22 +20,33 @@ async def move_data_to_monthly(db):
             time_spent = round(time_spent, 2)
 
             # Check if the row exists in MonthlyStats
-            matching_row = await db.execute("SELECT * FROM MonthlyStats WHERE UserID = ? AND ChannelID = ?",
-                                            (user_id, channel_id))
+            matching_row = await db.execute(
+                "SELECT * FROM MonthlyStats WHERE UserID = ? AND ChannelID = ?",
+                (user_id, channel_id))
             matching_row = await matching_row.fetchone()
 
             if matching_row:
                 # If the row exists, update the TimeSpent
                 new_time_spent = matching_row[2] + time_spent
                 new_time_spent = round(new_time_spent, 2)
-                await db.execute("UPDATE MonthlyStats SET TimeSpent = ? WHERE UserID = ? AND ChannelID = ?",
-                                 (new_time_spent, user_id, channel_id))
+                await db.execute(
+                    "UPDATE MonthlyStats SET TimeSpent = ? WHERE UserID = ? AND ChannelID = ?",
+                    (new_time_spent, user_id, channel_id))
                 await db.commit()
             else:
-                # If the row doesn't exist, insert a new row with TimeSpent
-                await db.execute("INSERT INTO MonthlyStats (UserID, ChannelID, TimeSpent) VALUES (?, ?, ?)",
-                                 (user_id, channel_id, time_spent))
+                # If the row doesn't exist, insert a new row with TimeSpent and current month
+                await db.execute(
+                    "INSERT INTO MonthlyStats (UserID, ChannelID, TimeSpent, Month) VALUES (?, ?, ?, ?)",
+                    (user_id, channel_id, time_spent, current_month))
                 await db.commit()
+
+
+async def monthly_wipe(db):
+    current_month = datetime.datetime.utcnow().month
+    target_month = (current_month - 3) % 12
+
+    await db.execute("DELETE FROM MonthlyStats WHERE Month = ?", (target_month,))
+    await db.commit()
 
 
 async def weekly_wipe(db):
@@ -104,6 +117,7 @@ async def db_conversion(db):
                     await update_alltime_stats(db)
                     await move_data(db)
                     await weekly_wipe(db)
+                    await monthly_wipe(db)
 
 
 class VoiceListener(commands.Cog):

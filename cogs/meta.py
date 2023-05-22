@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from config import GUILD_ID
 import aiosqlite
+from voiceListener import move_data_to_monthly
 
 
 class Meta(commands.Cog):
