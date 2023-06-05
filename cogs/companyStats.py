@@ -56,6 +56,7 @@ class CompanyStats(commands.Cog):
                                    timestamp=discord.utils.utcnow())
 
                 for user_id, stats in user_stats.items():
+                    member = guild.get_member(user_id)
                     total_time_spent = sum(stats.values())
                     minutes, seconds = divmod(total_time_spent, 60)
                     hours, minutes = divmod(minutes, 60)
