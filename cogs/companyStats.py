@@ -59,23 +59,13 @@ class CompanyStats(commands.Cog):
                     total_time_spent = sum(stats.values())
                     minutes, seconds = divmod(total_time_spent, 60)
                     hours, minutes = divmod(minutes, 60)
-                    days, hours = divmod(hours, 24)
-                    days = round(days, 2)
-                    hours = round(hours, 2)
 
-                    user_name = self.bot.get_user(user_id)
-                    time_string = ""
-                    if days > 0:
-                        time_string += f"{int(days)} days, "
                     if hours >= 1:
-                        time_string += f"{int(hours)} hours."
-
-
-                    if hours or days >=1:
-                        em.add_field(name=f"User ID: {user_name.display_name}",
+                        time_string = f"{int(hours)} hours."
+                        em.add_field(name=f"User ID: {member.display_name}",
                                      value=f"**Total Play Time:** {time_string}", inline=False)
 
-            self.alltime_pages.append(em)
+                self.alltime_pages.append(em)
 
     async def weeklystats(self, role_id, guild_id):
         guild = self.bot.get_guild(guild_id)
@@ -115,8 +105,6 @@ class CompanyStats(commands.Cog):
 
                     user_name = self.bot.get_user(user_id)
                     time_string = ""
-                    if days > 0:
-                        time_string += f"{int(days)} days, "
                     if hours >= 1:
                         time_string += f"{int(hours)} hours."
 
@@ -182,12 +170,8 @@ class CompanyStats(commands.Cog):
 
                     minutes, seconds = divmod(time_spent, 60)
                     hours, minutes = divmod(minutes, 60)
-                    days, hours = divmod(hours, 24)
 
-                    if days >= 1:
-                        month_data += f"**User: {member.display_name}**," \
-                                      f" Time: {int(days)} days, {int(hours)} hours.\n"
-                    elif hours >= 1:
+                    if hours >= 1:
                         month_data += f"**User: {member.display_name}**, Time: {int(hours)} hours.\n"
 
                 if month_data:
