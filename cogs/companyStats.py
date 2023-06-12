@@ -195,7 +195,7 @@ class CompanyStats(commands.Cog):
     def get_pages(self):
         return self.pages
 
-    skirastats = SlashCommandGroup("companystats", "Shows all time stats for all users in x role with different commands"
+    skirastats = SlashCommandGroup("unitstats", "Shows all time stats for all users in x role with different commands"
                                                    "for different time scales.")
 
     @skirastats.command(name="alltime", description="Shows all time stats for all users in x role")
