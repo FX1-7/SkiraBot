@@ -104,7 +104,7 @@ class CompanyStats(commands.Cog):
                     days = round(days, 2)
                     hours = round(hours, 2)
 
-                    user_name = self.bot.get_user(user_id)
+                    user_name = guild.get_member(user_id)
                     time_string = ""
                     if hours >= 1:
                         time_string += f"{int(hours)} hours."
