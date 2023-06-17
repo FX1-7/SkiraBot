@@ -210,6 +210,8 @@ class CompanyStats(commands.Cog):
 
     @skirastats.command(name="alltime", description="Shows all time stats for all users in x role")
     async def alltime(self, ctx: discord.ApplicationContext, role: discord.Role):
+        self.alltime_pages = []
+
         await self.allstats(role.id, ctx.guild_id)
 
         paginator = pages.Paginator(pages=self.get_alltime_pages())
