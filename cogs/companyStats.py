@@ -73,8 +73,9 @@ class CompanyStats(commands.Cog):
                 if len(em.fields) > 0:
                     em_list.append(em)
 
-                page = pages.Page(content="", embeds=em_list)
-                self.alltime_pages.append(page)
+                for em in em_list:
+                    page = pages.Page(content="", embeds=[em])
+                    self.alltime_pages.append(page)
 
     async def weeklystats(self, role_id, guild_id):
         guild = self.bot.get_guild(guild_id)
