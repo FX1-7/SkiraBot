@@ -52,8 +52,6 @@ class CompanyStats(commands.Cog):
                     else:
                         user_stats[user_id][channel_id] = time_spent
 
-                em = discord.Embed(title=f"🔊 All Time Voice Stats - {role} 🔊", colour=MAIN,
-                                   timestamp=discord.utils.utcnow())
                 em_list = []
 
                 for user_id, stats in user_stats.items():
@@ -64,6 +62,8 @@ class CompanyStats(commands.Cog):
 
                     if hours >= 1:
                         time_string = f"{int(hours)} hours."
+                        em = discord.Embed(title=f"🔊 All Time Voice Stats - {role} 🔊", colour=MAIN,
+                                           timestamp=discord.utils.utcnow())
                         if len(em.fields) < 25:
                             em.add_field(name=f"User ID: {member.display_name}",
                                          value=f"**Total Play Time:** {time_string}", inline=False)
