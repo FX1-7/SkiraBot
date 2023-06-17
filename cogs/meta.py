@@ -8,13 +8,13 @@ class Meta(commands.Cog):
 
     @commands.slash_command(guild_ids=[GUILD_ID], permissions=["manage_message"])
     async def purge(self, ctx, amount: int, error: discord.errors.NotFound):
-        await ctx.defer()
-        if isinstance(error, discord.errors.NotFound):
+        try:
+            await ctx.defer()
+            await ctx.channel.purge(limit=amount + 1)
             await ctx.respond(f"{ctx.author.mention}, you do not have permission to use that command.")
-            return
-        await ctx.channel.purge(limit=amount+1)
-        await ctx.respond(f'{amount} Messages cleared by {ctx.author.mention}',
-                          ephemeral=True)
+        except commands.MissingPermissions:
+            await ctx.respond(f'{amount} Messages cleared by {ctx.author.mention}',
+                              ephemeral=True)
 
     @commands.command()
     # @commands.has_role(KEIRAN_ID)
