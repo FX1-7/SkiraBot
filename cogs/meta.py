@@ -6,15 +6,14 @@ import aiosqlite
 
 class Meta(commands.Cog):
 
-    @commands.slash_command(guild_ids=[GUILD_ID], permissions=["manage_message"])
-    async def purge(self, ctx, amount: int, error: discord.errors.NotFound):
-        try:
-            await ctx.defer()
-            await ctx.channel.purge(limit=amount + 1)
-            await ctx.respond(f"{ctx.author.mention}, you do not have permission to use that command.")
-        except commands.MissingPermissions:
-            await ctx.respond(f'{amount} Messages cleared by {ctx.author.mention}',
-                              ephemeral=True)
+    @commands.command()
+    @commands.has_permissions(manage_messages=True)
+    async def purge(self, ctx, amount: int):
+        """
+        Purges messages.
+        """
+        await ctx.channel.purge(limit=amount + 1)
+        await ctx.send(f'{amount} Messages cleared by {ctx.author.mention}', delete_after=6)
 
     @commands.command()
     # @commands.has_role(KEIRAN_ID)
