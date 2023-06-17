@@ -70,7 +70,7 @@ class CompanyStats(commands.Cog):
                         else:
                             em_list.append(em)
 
-                self.alltime_pages.extend(em_list)
+                self.alltime_pages.append(em_list)
 
     async def weeklystats(self, role_id, guild_id):
         guild = self.bot.get_guild(guild_id)
