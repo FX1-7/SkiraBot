@@ -31,17 +31,17 @@ class Meta(commands.Cog):
             if table == "m":
                 await db.execute("DELETE FROM MonthlyStats Where UserID = ?", (userid,))
                 await db.commit()
-                ctx.send(content="Deleted from Monthly")
+                await ctx.send(content="Deleted from Monthly")
             elif table == "w":
                 await db.execute("DELETE FROM WeeklyStats Where UserID = ?", (userid,))
                 await db.commit()
-                ctx.send(content="Deleted from Weekly")
+                await ctx.send(content="Deleted from Weekly")
             elif table == "a":
                 await db.execute("DELETE FROM AllTimeStats Where UserID = ?", (userid,))
                 await db.commit()
-                ctx.send(content="Deleted from AllTime")
+                await ctx.send(content="Deleted from AllTime")
             else:
-                ctx.send(content="Error!")
+                await ctx.send(content="Error!")
 
 
 def setup(bot):
