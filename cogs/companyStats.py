@@ -52,7 +52,9 @@ class CompanyStats(commands.Cog):
                     else:
                         user_stats[user_id][channel_id] = time_spent
 
-                em_list = []
+                em = discord.Embed(title=f"🔊 All Time Voice Stats - {role} 🔊", colour=MAIN,
+                                   timestamp=discord.utils.utcnow())
+
                 for user_id, stats in user_stats.items():
                     member = guild.get_member(user_id)
                     total_time_spent = sum(stats.values())
@@ -61,13 +63,13 @@ class CompanyStats(commands.Cog):
 
                     if hours >= 1:
                         time_string = f"{int(hours)} hours."
-                        em = discord.Embed(title=f"🔊 All Time Voice Stats - {role} 🔊", colour=MAIN,
-                                           timestamp=discord.utils.utcnow())
-                        em.add_field(name=f"User ID: {member.display_name}",
-                                     value=f"**Total Play Time:** {time_string}", inline=False)
-                        em_list.append(em)
+                        if len(em.fields) < 25:
+                            em.add_field(name=f"User ID: {member.display_name}",
+                                         value=f"**Total Play Time:** {time_string}", inline=False)
+                        else:
+                            continue
 
-                self.alltime_pages.append(em_list)
+                self.alltime_pages.append(em)
 
     async def weeklystats(self, role_id, guild_id):
         guild = self.bot.get_guild(guild_id)
@@ -198,6 +200,7 @@ class CompanyStats(commands.Cog):
 
     skirastats = SlashCommandGroup("unitstats", "Shows all time stats for all users in x role with different commands"
                                                    "for different time scales.")
+
 
     @skirastats.command(name="alltime", description="Shows all time stats for all users in x role")
     async def alltime(self, ctx: discord.ApplicationContext, role: discord.Role):
