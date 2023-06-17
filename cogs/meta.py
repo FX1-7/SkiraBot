@@ -6,7 +6,7 @@ import aiosqlite
 
 class Meta(commands.Cog):
 
-    @discord.slash_command(guild_ids=[GUILD_ID], permissions=["manage_message"])
+    @commands.slash_command(guild_ids=[GUILD_ID], permissions=["manage_message"])
     async def purge(self, ctx, amount: int, error: discord.errors.NotFound):
         await ctx.defer()
         if isinstance(error, discord.errors.NotFound):
