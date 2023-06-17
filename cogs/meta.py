@@ -44,6 +44,5 @@ class Meta(commands.Cog):
                 ctx.send(content="Error!")
 
 
-
 def setup(bot):
     bot.add_cog(Meta(bot))
