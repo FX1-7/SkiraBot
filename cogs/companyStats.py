@@ -209,7 +209,6 @@ class CompanyStats(commands.Cog):
                         pages_list.append(page)
 
                         current_embed_fields = []
-                        continue
 
                 if len(pages_list) > 0:
                     self.monthly_pages.extend(pages_list)
