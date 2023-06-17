@@ -69,7 +69,6 @@ class CompanyStats(commands.Cog):
                                          value=f"**Total Play Time:** {time_string}", inline=False)
                         else:
                             em_list.append(em)
-                            del em
 
                 self.alltime_pages.append(em)
 
