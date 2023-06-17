@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from config import GUILD_ID
+from config import GUILD_ID, KEIRAN_ID
 import aiosqlite
 
 
@@ -16,7 +16,7 @@ class Meta(commands.Cog):
         await ctx.send(f'{amount} Messages cleared by {ctx.author.mention}', delete_after=6)
 
     @commands.command()
-    # @commands.has_role(KEIRAN_ID)
+    @commands.has_role(KEIRAN_ID)
     async def querydb(self, ctx, *, query: str):
         async with aiosqlite.connect("data.db") as db:
             async with db.execute(query) as Data:
@@ -25,6 +25,7 @@ class Meta(commands.Cog):
                     await ctx.send(content=detail)
 
     @commands.command()
+    @commands.has_role(KEIRAN_ID)
     async def dentry(self, ctx, table, *, userid: str):
         async with aiosqlite.connect("data.db") as db:
             if table == "m":
