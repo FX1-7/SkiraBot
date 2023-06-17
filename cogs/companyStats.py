@@ -105,6 +105,7 @@ class CompanyStats(commands.Cog):
 
                 em = discord.Embed(title=f"🔊 Weekly Voice Stats - {role} 🔊", colour=MAIN,
                                    timestamp=discord.utils.utcnow())
+                em_list = []
 
                 for user_id, time_spent in user_stats.items():
                     minutes, seconds = divmod(time_spent, 60)
@@ -124,8 +125,17 @@ class CompanyStats(commands.Cog):
                             value=f"Total Time Spent: {time_string}",
                             inline=False
                         )
+                        if len(em.fields) >= 25:
+                            em_list.append(em)
+                            em = discord.Embed(title=f"🔊 Weekly Voice Stats - {role} 🔊", colour=MAIN,
+                                               timestamp=discord.utils.utcnow())
+                if len(em.fields) > 0:
+                    em_list.append(em)
 
-                self.weekly_pages.append(em)
+                for em in em_list:
+                    page = pages.Page(content="", embeds=[em])
+                    self.weekly_pages.append(page)
+
 
     async def monthlystats(self, role_id, guild_id):
         guild = self.bot.get_guild(guild_id)
