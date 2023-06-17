@@ -134,14 +134,13 @@ class CompanyStats(commands.Cog):
             current_month = datetime.datetime.utcnow().month
             target_months = [(current_month - i) % 12 for i in range(3)]
 
-            em = discord.Embed(title=f"🔊 Monthly Voice Stats - {role} 🔊", colour=MAIN, timestamp=discord.utils.utcnow())
-
-            monthly_stats = {}
-
             for target_month in target_months:
+                monthly_stats = {}
+
                 async with db.execute(
                         "SELECT UserID, SUM(TimeSpent) AS TotalTimeSpent FROM MonthlyStats WHERE Month = ? GROUP BY UserID",
-                        (target_month,)) as MonthlyStats:
+                        (target_month,),
+                ) as MonthlyStats:
                     monthly_entry = await MonthlyStats.fetchall()
 
                     month_stats = {}
@@ -166,11 +165,10 @@ class CompanyStats(commands.Cog):
 
                     monthly_stats[target_month] = month_stats
 
-            for target_month, month_stats in monthly_stats.items():
                 month_name = datetime.date(1900, target_month, 1).strftime("%B")
-                month_data = ""
 
-                for user_id, time_spent in month_stats.items():
+                user_data = []
+                for user_id, time_spent in monthly_stats[target_month].items():
                     member = guild.get_member(user_id)
                     if member is None:
                         continue
@@ -182,15 +180,39 @@ class CompanyStats(commands.Cog):
                     hours, minutes = divmod(minutes, 60)
 
                     if hours >= 1:
-                        month_data += f"**User: {member.display_name}**, Time: {int(hours)} hours.\n"
+                        user_data.append(f"**User: {member.display_name}**, Time: {int(hours)} hours.")
 
-                if month_data:
-                    em.add_field(name=f"{month_name}", value=month_data, inline=False)
-                    em.set_footer(text=f"{month_name}")
+                pages_list = []
+                current_embed_fields = []
+                for index, user_entry in enumerate(user_data, start=1):
+                    current_embed_fields.append(user_entry)
+                    if index % 25 == 0 or index == len(user_data):
+                        em = discord.Embed(
+                            title=f"🔊 Monthly Voice Stats - {role} 🔊",
+                            colour=MAIN,
+                            timestamp=discord.utils.utcnow(),
+                        )
+                        em.add_field(name=f"{month_name}", value="\n".join(current_embed_fields), inline=False)
+                        em.set_footer(text=f"{month_name}")
+
+                        page = pages.Page(content="", embeds=[em])
+                        pages_list.append(page)
+
+                        current_embed_fields = []
+
+                if len(pages_list) > 0:
+                    self.monthly_pages.extend(pages_list)
                 else:
+                    em = discord.Embed(
+                        title=f"🔊 Monthly Voice Stats - {role} 🔊",
+                        colour=MAIN,
+                        timestamp=discord.utils.utcnow(),
+                    )
                     em.add_field(name=f"{month_name}", value="No data available", inline=False)
+                    em.set_footer(text=f"{month_name}")
 
-            self.monthly_pages.append(em)
+                    page = pages.Page(content="", embeds=[em])
+                    self.monthly_pages.append(page)
 
     def get_alltime_pages(self):
         return self.alltime_pages
