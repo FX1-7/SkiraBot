@@ -195,27 +195,10 @@ class CompanyStats(commands.Cog):
                 pages_list = []
                 current_embed_fields = []
                 for index, user_entry in enumerate(user_data, start=1):
-                    try:
-                        current_embed_fields.append(user_entry)
-                        if index % 25 == 0 or index == len(user_data):
-                            em = discord.Embed(
-                                title=f"🔊 Monthly Voice Stats - {role} 🔊",
-                                colour=MAIN,
-                                timestamp=discord.utils.utcnow(),
-                            )
-                            em.add_field(name=f"{month_name}", value="\n".join(current_embed_fields), inline=False)
-                            em.set_footer(text=f"{month_name}")
-
-                            page = pages.Page(content="", embeds=[em])
-                            pages_list.append(page)
-
-                            current_embed_fields = []
-
-                    except discord.errors.HTTPException as e:
-                        # Handle the error gracefully
-                        print(f"Error occurred while adding field: {str(e)}")
+                    current_embed_fields.append(user_entry)
+                    if index % 25 == 0 or index == len(user_data):
                         em = discord.Embed(
-                            title=f"Monthly Stats - {role}",
+                            title=f"🔊 Monthly Voice Stats - {role} 🔊",
                             colour=MAIN,
                             timestamp=discord.utils.utcnow(),
                         )
