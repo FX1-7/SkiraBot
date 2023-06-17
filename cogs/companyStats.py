@@ -54,6 +54,7 @@ class CompanyStats(commands.Cog):
 
                 em = discord.Embed(title=f"🔊 All Time Voice Stats - {role} 🔊", colour=MAIN,
                                    timestamp=discord.utils.utcnow())
+                em_list = []
 
                 for user_id, stats in user_stats.items():
                     member = guild.get_member(user_id)
@@ -67,7 +68,8 @@ class CompanyStats(commands.Cog):
                             em.add_field(name=f"User ID: {member.display_name}",
                                          value=f"**Total Play Time:** {time_string}", inline=False)
                         else:
-                            continue
+                            em_list.append(em)
+                            del em
 
                 self.alltime_pages.append(em)
 
