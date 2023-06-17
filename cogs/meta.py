@@ -26,7 +26,7 @@ class Meta(commands.Cog):
                     await ctx.send(content=detail)
 
     @commands.command()
-    async def delentry(self, ctx, table, *, userid: str):
+    async def dentry(self, ctx, table, *, userid: str):
         async with aiosqlite.connect("data.db") as db:
             if table == "m":
                 await db.execute("DELETE FROM MonthlyStats Where UserID = ?", (userid,))
