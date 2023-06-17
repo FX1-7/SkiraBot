@@ -131,7 +131,11 @@ class VoiceListener(commands.Cog):
         if before.channel != after.channel:
             if before.channel and before.channel.id in TRACK_CHANNEL:
                 if before.channel is not None:
-                    duration = round(time.time() - time_start.get(member.id, 0), 2)
+                    if member.id in time_start:
+                        duration = round(time.time() - time_start.get(member.id, 0), 2)
+                        del time_start[member.id]
+                    else:
+                        duration = 0
                     async with aiosqlite.connect("data.db") as db:
                         query = "SELECT * FROM WeeklyStats WHERE UserID=? AND ChannelID=?"
                         rows = await db.execute(query, (member.id, before.channel.id))
