@@ -52,9 +52,7 @@ class CompanyStats(commands.Cog):
                     else:
                         user_stats[user_id][channel_id] = time_spent
 
-                em = discord.Embed(title=f"🔊 All Time Voice Stats - {role} 🔊", colour=MAIN,
-                                   timestamp=discord.utils.utcnow())
-
+                em_list = []
                 for user_id, stats in user_stats.items():
                     member = guild.get_member(user_id)
                     total_time_spent = sum(stats.values())
@@ -63,10 +61,13 @@ class CompanyStats(commands.Cog):
 
                     if hours >= 1:
                         time_string = f"{int(hours)} hours."
+                        em = discord.Embed(title=f"🔊 All Time Voice Stats - {role} 🔊", colour=MAIN,
+                                           timestamp=discord.utils.utcnow())
                         em.add_field(name=f"User ID: {member.display_name}",
                                      value=f"**Total Play Time:** {time_string}", inline=False)
+                        em_list.append(em)
 
-                self.alltime_pages.append(em)
+                self.alltime_pages.append(em_list)
 
     async def weeklystats(self, role_id, guild_id):
         guild = self.bot.get_guild(guild_id)
