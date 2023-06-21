@@ -121,12 +121,9 @@ class CompanyStats(commands.Cog):
                         time_string += f"{int(hours)} hours."
                         user_data.append(f"**User: {user_name.display_name}**, Time: {int(hours)} hours.")
 
-                    #if hours or days >= 1:
-                        #em.add_field(name="Weekly", value=f"**User ID: {user_name.display_name},** Time: {time_string}"
-                                     #, inline=False)
                 for index, user_entry in enumerate(user_data, start=1):
                     current_embed_fields.append(user_entry)
-                    if index % 25 == 0 or index == len(user_data):
+                    if index % 15 == 0 or index == len(user_data):
                         em = discord.Embed(title=f"🔊 Weekly Voice Stats - {role} 🔊", colour=MAIN,
                                            timestamp=discord.utils.utcnow())
                         em.add_field(name=f"Weekly Stats", value=f"\n".join(current_embed_fields), inline=False)
@@ -148,17 +145,6 @@ class CompanyStats(commands.Cog):
                     page = pages.Page(content="", embeds=[em])
                     self.weekly_pages = [page]
 
-                    #if len(em.fields) >= 25:
-                        #em_list.append(em)
-                        #em = discord.Embed(title=f"🔊 Weekly Voice Stats - {role} 🔊", colour=MAIN,
-                                           #timestamp=discord.utils.utcnow())
-
-                #if len(em.fields) > 0:
-                    #em_list.append(em)
-
-                #for em in em_list:
-                    #page = pages.Page(content="", embeds=[em])
-                    #self.weekly_pages.append(page)
 
 
     async def monthlystats(self, role_id, guild_id):
