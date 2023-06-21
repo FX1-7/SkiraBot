@@ -206,7 +206,7 @@ class CompanyStats(commands.Cog):
                 current_embed_fields = []
                 for index, user_entry in enumerate(user_data, start=1):
                     current_embed_fields.append(user_entry)
-                    if index % 25 == 0 or index == len(user_data):
+                    if index % 15 == 0 or index == len(user_data):
                         em = discord.Embed(
                             title=f"🔊 Monthly Voice Stats - {role} 🔊",
                             colour=MAIN,
