@@ -120,7 +120,7 @@ class CompanyStats(commands.Cog):
                         time_string += f"{int(hours)} hours."
 
                     if hours or days >= 1:
-                        em.add_field(value=f"**User ID: {user_name.display_name},** Time: {time_string}"
+                        em.add_field(name="Weekly", value=f"**User ID: {user_name.display_name},** Time: {time_string}"
                                      , inline=False)
                         if len(em.fields) >= 25:
                             em_list.append(em)
