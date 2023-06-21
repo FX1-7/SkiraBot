@@ -103,9 +103,10 @@ class CompanyStats(commands.Cog):
 
                     user_stats[user_id] = time_spent
 
-                em = discord.Embed(title=f"🔊 Weekly Voice Stats - {role} 🔊", colour=MAIN,
-                                   timestamp=discord.utils.utcnow())
                 em_list = []
+                user_data = []
+                current_embed_fields = []
+                pages_list = []
 
                 for user_id, time_spent in user_stats.items():
                     minutes, seconds = divmod(time_spent, 60)
@@ -118,20 +119,46 @@ class CompanyStats(commands.Cog):
                     time_string = ""
                     if hours >= 1:
                         time_string += f"{int(hours)} hours."
+                        user_data.append(f"**User: {user_name.display_name}**, Time: {int(hours)} hours.")
 
-                    if hours or days >= 1:
-                        em.add_field(name="Weekly", value=f"**User ID: {user_name.display_name},** Time: {time_string}"
-                                     , inline=False)
-                        if len(em.fields) >= 25:
-                            em_list.append(em)
-                            em = discord.Embed(title=f"🔊 Weekly Voice Stats - {role} 🔊", colour=MAIN,
-                                               timestamp=discord.utils.utcnow())
-                if len(em.fields) > 0:
-                    em_list.append(em)
+                    #if hours or days >= 1:
+                        #em.add_field(name="Weekly", value=f"**User ID: {user_name.display_name},** Time: {time_string}"
+                                     #, inline=False)
+                for index, user_entry in enumerate(user_data, start=1):
+                    current_embed_fields.append(user_entry)
+                    if index % 25 == 0 or index == len(user_data):
+                        em = discord.Embed(title=f"🔊 Weekly Voice Stats - {role} 🔊", colour=MAIN,
+                                           timestamp=discord.utils.utcnow())
+                        em.add_field(name=f"Weekly Stats", value=f"\n".join(current_embed_fields), inline=False)
+                        em.set_footer(text="Weekly Stats")
 
-                for em in em_list:
+                        page = pages.Page(content="", embeds=[em])
+                        pages_list.append(page)
+
+                        current_embed_fields = []
+
+                if len(pages_list) > 0:
+                    self.weekly_pages.extend(pages_list)
+                else:
+                    em = discord.Embed(title=f"🔊 Weekly Voice Stats - {role} 🔊", colour=MAIN,
+                                       timestamp=discord.utils.utcnow())
+                    em.add_field(name="Weekly Stats", value="No data available", inline=False)
+                    em.set_footer(text="Weekly Stats")
+
                     page = pages.Page(content="", embeds=[em])
-                    self.weekly_pages.append(page)
+                    self.weekly_pages = [page]
+
+                    #if len(em.fields) >= 25:
+                        #em_list.append(em)
+                        #em = discord.Embed(title=f"🔊 Weekly Voice Stats - {role} 🔊", colour=MAIN,
+                                           #timestamp=discord.utils.utcnow())
+
+                #if len(em.fields) > 0:
+                    #em_list.append(em)
+
+                #for em in em_list:
+                    #page = pages.Page(content="", embeds=[em])
+                    #self.weekly_pages.append(page)
 
 
     async def monthlystats(self, role_id, guild_id):
@@ -225,7 +252,10 @@ class CompanyStats(commands.Cog):
         return self.alltime_pages
 
     def get_weekly_pages(self):
-        return self.weekly_pages
+        if self.weekly_pages is None:
+            return []
+        else:
+            return self.weekly_pages
 
     def get_monthly_pages(self):
         return self.monthly_pages
@@ -254,6 +284,7 @@ class CompanyStats(commands.Cog):
 
         paginator = pages.Paginator(pages=self.get_weekly_pages())
         await paginator.respond(ctx.interaction)
+
 
     @skirastats.command(name="monthly", description="Shows Weekly time stats for all users in x role")
     async def monthly(self, ctx: discord.ApplicationContext, role: discord.Role):
