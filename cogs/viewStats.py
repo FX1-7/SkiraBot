@@ -121,14 +121,10 @@ class ViewStats(commands.Cog):
         em = discord.Embed(title=f"Current Tracking",
                            colour=MAIN, timestamp=discord.utils.utcnow())
         em.add_field(name="Channels:", value="", inline=False)
-        channels = []
-        for x in TRACK_CHANNEL[:-1]:
+        for x in TRACK_CHANNEL:
             channel_id = ctx.guild.get_channel(x).id
-            em.add_field(name="", value=f"\n<#{channel_id}>, ", inline=False)
+            em.add_field(name="", value=f"\n<#{channel_id}> ", inline=False)
 
-        dict_length = len(TRACK_CHANNEL)
-        last_channel_id = ctx.guild.get_channel(TRACK_CHANNEL[dict_length-1]).id
-        em.add_field(name="", value=f"\n<#{last_channel_id}>.", inline=False)
         await ctx.respond(embed=em)
 
 def setup(bot):
