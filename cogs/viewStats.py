@@ -6,7 +6,7 @@ from config import MAIN
 import time
 import aiosqlite
 from utils.utils import utc_now
-from config import GUILD_ID
+from config import GUILD_ID, TRACK_CHANNEL
 
 
 class ViewStats(commands.Cog):
@@ -116,6 +116,20 @@ class ViewStats(commands.Cog):
 
         await ctx.respond(embed=em)
 
+    @discord.slash_command(guild_ids=[GUILD_ID])
+    async def tracking(self, ctx: discord.ApplicationContext):
+        em = discord.Embed(title=f"Current Tracking",
+                           colour=MAIN, timestamp=discord.utils.utcnow())
+        em.add_field(name="Channels:", value="", inline=False)
+        channels = []
+        for x in TRACK_CHANNEL[:-1]:
+            channel_id = ctx.guild.get_channel(x).id
+            em.add_field(name="", value=f"\n<#{channel_id}>, ", inline=False)
+
+        dict_length = len(TRACK_CHANNEL)
+        last_channel_id = ctx.guild.get_channel(TRACK_CHANNEL[dict_length-1]).id
+        em.add_field(name="", value=f"\n<#{last_channel_id}>.", inline=False)
+        await ctx.respond(embed=em)
 
 def setup(bot):
     bot.add_cog(ViewStats(bot))
