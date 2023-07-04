@@ -97,7 +97,7 @@ async def move_data(db):
 
             # Retrieve the new row and update TimeSpent with the weekly time spent
             rows = await db.execute("SELECT * FROM AllTimeStats WHERE UserID = ? AND ChannelID = ?",
-                                     (user_id, channel_id))
+                                    (user_id, channel_id))
             new_row = await rows.fetchone()
             new_time_spent = new_row[2] + time_spent
             new_time_spent = round(new_time_spent, 2)
@@ -110,14 +110,12 @@ async def move_data(db):
 
 async def db_conversion(db):
     if utc_now().day == 1:
-        async with db.execute("SELECT Date, Month FROM LastUpdated") as last_date:
-            last_date = await last_date.fetchall()
-            for date in last_date:
-                if date[0] == 1 and date[1] != utc_now().month:
-                    await update_alltime_stats(db)
-                    await move_data(db)
-                    await weekly_wipe(db)
-                    await monthly_wipe(db)
+        await update_alltime_stats(db)
+        await move_data(db)
+        await weekly_wipe(db)
+        await monthly_wipe(db)
+        await db.execute("UPDATE LastUpdated SET Month=?", (utc_now().month,))
+        await db.commit()
 
 
 class VoiceListener(commands.Cog):
