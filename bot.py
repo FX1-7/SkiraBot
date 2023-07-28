@@ -14,7 +14,6 @@ class Bot(commands.Bot):
         startup = bot.user.name + " is running"
         print(startup)
         print("-" * len(startup))  # Print a line of dashes as long as the last print line for neatness
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=f"Squad"))
 
         channel = self.get_channel(LOG_ID)
         await channel.send(f"<@114352655857483782> - restart detected.")
